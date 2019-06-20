@@ -20,7 +20,7 @@
 //!
 //! ```rust
 //! use std::{fs::File, io::Read};
-//! use easy_error::{Error, ResultExt};
+//! use easy_error::{ensure, Error, ResultExt};
 //!
 //! fn run(file: &str) -> Result<i32, Error> {
 //!     let mut file = File::open(file).context("Could not open file")?;

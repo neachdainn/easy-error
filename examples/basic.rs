@@ -1,8 +1,8 @@
-use easy_error::{Error, ResultExt};
+use easy_error::{ensure, Error, ResultExt};
 use std::{fs::File, io::Read};
 
 fn run() -> Result<i32, Error> {
-    let file = std::env::args().nth(1).unwrap_or("example.txt");
+    let file = std::env::args().nth(1).unwrap_or("example.txt".to_string());
     let mut file = File::open(file).context("Could not open file")?;
 
     let mut contents = String::new();
