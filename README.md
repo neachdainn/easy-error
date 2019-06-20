@@ -6,6 +6,7 @@ It does not attempt to do anything clever other than provide a simple error type
 ## Example
 
 ```rust
+use std::{fs::File, io::Read};
 use simple_error::{Error, ResultExt};
 
 fn run(file: &str) -> Result<i32, Error> {
