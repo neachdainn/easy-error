@@ -7,6 +7,20 @@ stages:
   - test
   - docs
 
+# Make sure that the style is correct. Since we use unstable formatting
+# features, we use the nightly toolchain for this.
+format:
+  image: "rustlang/rust:nightly-slim"
+  stage: analysis
+  script:
+    - rustup component add rustfmt
+    - cargo fmt --version
+    - cargo fmt -- --check
+  only:
+    - tags
+    - master
+    - merge_requests
+
 # Make sure we're listening to Clippy
 clippy:
   stage: analysis
