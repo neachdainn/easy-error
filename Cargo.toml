@@ -4,6 +4,17 @@ version = "0.1.0"
 authors = ["Nathan Kent <nate@nkent.net>"]
 edition = "2018"
 
+description = "Simple error utilities"
+repository = "https://gitlab.com/neachdainn/easy-error"
+readme = "README.md"
+license = "MIT"
+
+keywords = ["error", "simple", "chain"]
+categories = ["rust-patterns"]
+
 publish = false
+
+[badges]
+gitlab = { repository = "neachdainn/easy-error", branch = "master" }
 
 [dependencies]
