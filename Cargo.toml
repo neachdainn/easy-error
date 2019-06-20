@@ -1,5 +1,5 @@
 [package]
-name = "simple-error"
+name = "easy-error"
 version = "0.1.0"
 authors = ["Nathan Kent <nate@nkent.net>"]
 edition = "2018"
