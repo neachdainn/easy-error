@@ -1,0 +1,87 @@
+image: "rust:latest"
+
+# If we run the test before the docs, we can cache the build and not waste time
+# building it again.
+stages:
+  - analysis
+  - test
+  - docs
+
+# Make sure we're listening to Clippy
+clippy:
+  stage: analysis
+  script:
+    - rustup component add clippy
+    - cargo clippy --version
+    - cargo clippy --all-targets --all-features
+  only:
+    - tags
+    - master
+    - merge_requests
+
+# Test the project against the minimum Rust version to make sure we don't raise it
+minimum-rust-version:
+  image: "rust:1.32-slim"
+  stage: test
+  script:
+    - rustc --version
+    - cargo --version
+    - cargo test --all --all-features --verbose
+  only:
+    - tags
+    - master
+    - merge_requests
+
+# Check against the current stable for regressions
+stable:
+  stage: test
+  script:
+    - rustc --version
+    - cargo --version
+    - cargo test --all --all-features --verbose
+  only:
+    - tags
+    - master
+    - merge_requests
+
+# Also check against nightly for regressions
+nightly:
+  image: "rustlang/rust:nightly-slim"
+  stage: test
+  script:
+    - rustc --version
+    - cargo --version
+    - cargo test --all --all-features --verbose
+  allow_failure: true
+  only:
+    - tags
+    - master
+    - merge_requests
+
+# Make sure that the examples also build
+examples:
+  stage: docs
+  script:
+    - cargo build --examples
+  only:
+    - tags
+    - master
+    - merge_requests
+
+# Publish to the pages whenever master is updated
+pages:
+  stage: docs
+  script:
+    - cargo doc --no-deps
+    - mv target/doc public
+    - echo '<meta http-equiv="refresh" content="0; url=nng">' > public/index.html
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
+
+# Store these before jobs to speed up the build
+cache:
+  paths:
+    - target/
