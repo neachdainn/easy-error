@@ -45,6 +45,7 @@
 #![deny(clippy::all)]
 #![warn(clippy::nursery)]
 #![warn(clippy::pedantic)]
+#![allow(clippy::use_self)]
 
 use std::{error::Error as StdError, fmt, result::Result as StdResult};
 
@@ -119,7 +120,7 @@ impl<'a> Iterator for Causes<'a>
 	fn next(&mut self) -> Option<Self::Item>
 	{
 		let cause = self.cause.take();
-		self.cause = cause.and_then(|c| c.source());
+		self.cause = cause.and_then(StdError::source);
 
 		cause
 	}
