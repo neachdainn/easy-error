@@ -11,7 +11,7 @@
 //! cleaner.
 use std::{error::Error as StdError, fmt};
 
-pub type Result<T> = std::result::Result<T, Error>;
+pub type Result = std::result::Result<(), Error>;
 
 /// An error that wraps all other error types for a nicer debug output.
 pub struct Error
@@ -29,5 +29,13 @@ impl fmt::Debug for Error
 		}
 
 		Ok(())
+	}
+}
+
+impl<E: StdError + 'static> From<E> for Error
+{
+	fn from(err: E) -> Error
+	{
+		Error { inner: Box::new(err) }
 	}
 }
