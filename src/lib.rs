@@ -57,7 +57,6 @@ mod macros;
 pub type Result<T> = StdResult<T, Error>;
 
 /// An error that is a human-targetted string plus an optional cause.
-#[derive(Debug)]
 pub struct Error
 {
 	/// The human-targetting error string.
@@ -83,6 +82,19 @@ impl Error
 
 	/// Iterates over the causes of the error.
 	pub fn iter_causes(&self) -> Causes { Causes { cause: self.cause.as_ref().map(Box::as_ref) } }
+}
+
+impl fmt::Debug for Error
+{
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
+	{
+		writeln!(f, "{}", self.ctx)?;
+		for c in self.iter_causes() {
+			writeln!(f, "Caused by: {}", c)?;
+		}
+
+		Ok(())
+	}
 }
 
 impl fmt::Display for Error
