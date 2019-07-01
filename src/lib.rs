@@ -53,10 +53,12 @@
 use std::{error::Error as StdError, fmt, result::Result as StdResult};
 
 mod macros;
+pub mod termination;
 
 pub type Result<T> = StdResult<T, Error>;
 
 /// An error that is a human-targetted string plus an optional cause.
+#[derive(Debug)]
 pub struct Error
 {
 	/// The human-targetting error string.
@@ -82,19 +84,6 @@ impl Error
 
 	/// Iterates over the causes of the error.
 	pub fn iter_causes(&self) -> Causes { Causes { cause: self.cause.as_ref().map(Box::as_ref) } }
-}
-
-impl fmt::Debug for Error
-{
-	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
-	{
-		writeln!(f, "{}", self.ctx)?;
-		for c in self.iter_causes() {
-			writeln!(f, "Caused by: {}", c)?;
-		}
-
-		Ok(())
-	}
 }
 
 impl fmt::Display for Error
@@ -150,4 +139,4 @@ pub fn err_msg<S: Into<String>>(ctx: S) -> Error { Error { ctx: ctx.into(), caus
 
 /// Returns an iterator over the causes of an error.
 #[inline]
-pub fn iter_causes<E: StdError>(e: &E) -> Causes { Causes { cause: e.source() } }
+pub fn iter_causes<E: StdError + ?Sized>(e: &E) -> Causes { Causes { cause: e.source() } }
