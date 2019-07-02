@@ -1,7 +1,7 @@
-use easy_error::{ensure, Error, ResultExt};
+use easy_error::{ensure, ResultExt, termination};
 use std::{fs::File, io::Read};
 
-fn run() -> Result<i32, Error> {
+fn main() -> termination::Result {
     let file = std::env::args().nth(1).unwrap_or("example.txt".to_string());
     let mut file = File::open(file).context("Could not open file")?;
 
@@ -9,15 +9,9 @@ fn run() -> Result<i32, Error> {
     file.read_to_string(&mut contents)
         .context("Unable to read file")?;
 
-    let value = contents.trim().parse().context("Could not parse file")?;
+    let value: i32 = contents.trim().parse().context("Could not parse file")?;
     ensure!(value != 0, "Value cannot be zero");
 
-    Ok(value)
-}
-
-fn main() {
-    if let Err(e) = run() {
-        eprintln!("Error: {}", e);
-        e.iter_causes().for_each(|c| eprintln!("Caused by: {}", c));
-    }
+    println!("Value = {}", value);
+    Ok(())
 }
