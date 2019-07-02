@@ -1,12 +1,15 @@
 //! # Easy-error
 //!
-//! This crate is a lightweight error handling library meant to play well with
-//! the standard `Error` trait. There are three major components of this crate:
+//! This crate is a lightweight error handling library meant to play well with the standard `Error`
+//! trait. It is designed for quick prototyping or for Command-line applications where any error
+//! will simply bubble up to the user. There are four major components of this crate:
 //!
-//! 1. A basic, string-based error type that is meant for either quick
-//! prototyping or human-facing errors. 2. A nice way to iterate over the causes
-//! of an error. 3. Some macros that make returning errors slightly more
-//! ergonomic.
+//! 1. A basic, string-based error type that is meant for either quick prototyping or human-facing
+//!    errors.
+//! 2. A nice way to iterate over the causes of an error.
+//! 3. Some macros that make returning errors slightly more ergonomic.
+//! 4. A "termination" type that produces nicely formatted error messages when returned from the
+//!    `main` function.
 //!
 //! ## Rust Version Requirements
 //!
@@ -20,27 +23,19 @@
 //!
 //! ```rust
 //! use std::{fs::File, io::Read};
-//! use easy_error::{ensure, Error, ResultExt};
+//! use easy_error::{ResultExt, termination};
 //!
-//! fn run(file: &str) -> Result<i32, Error> {
-//!     let mut file = File::open(file).context("Could not open file")?;
+//! fn main() -> termination::Result {
+//!     let file_name = "example.txt";
+//!     let mut file = File::open(file_name).context("Could not open file")?;
 //!
 //!     let mut contents = String::new();
 //!     file.read_to_string(&mut contents).context("Unable to read file")?;
 //!
 //!     let value = contents.trim().parse().context("Could not parse file")?;
-//!     ensure!(value != 0, "Value cannot be zero");
+//!     println!("Value = {}", value);
 //!
-//!     Ok(value)
-//! }
-//!
-//! fn main() {
-//!     let file = "example.txt";
-//!
-//!     if let Err(e) = run(file) {
-//!         eprintln!("Error: {}", e);
-//!         e.iter_causes().for_each(|c| eprintln!("Caused by: {}", c));
-//!     }
+//!     Ok(())
 //! }
 //! ```
 
