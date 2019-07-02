@@ -1,12 +1,16 @@
 //! # Easy-error
 //!
 //! This crate is a lightweight error handling library meant to play well with
-//! the standard `Error` trait. There are three major components of this crate:
+//! the standard `Error` trait. It is designed for quick prototyping or for
+//! Command-line applications where any error will simply bubble up to the user.
+//! There are four major components of this crate:
 //!
 //! 1. A basic, string-based error type that is meant for either quick
-//! prototyping or human-facing errors. 2. A nice way to iterate over the causes
-//! of an error. 3. Some macros that make returning errors slightly more
-//! ergonomic.
+//!    prototyping or human-facing errors.
+//! 2. A nice way to iterate over the causes of an error.
+//! 3. Some macros that make returning errors slightly more ergonomic.
+//! 4. A "termination" type that produces nicely formatted error messages when
+//!    returned from the `main` function.
 //!
 //! ## Rust Version Requirements
 //!
@@ -18,29 +22,21 @@
 //!
 //! ## Example
 //!
-//! ```rust
+//! ```no_run
 //! use std::{fs::File, io::Read};
-//! use easy_error::{ensure, Error, ResultExt};
+//! use easy_error::{ResultExt, termination};
 //!
-//! fn run(file: &str) -> Result<i32, Error> {
-//!     let mut file = File::open(file).context("Could not open file")?;
+//! fn main() -> termination::Result {
+//!     let file_name = "example.txt";
+//!     let mut file = File::open(file_name).context("Could not open file")?;
 //!
 //!     let mut contents = String::new();
 //!     file.read_to_string(&mut contents).context("Unable to read file")?;
 //!
-//!     let value = contents.trim().parse().context("Could not parse file")?;
-//!     ensure!(value != 0, "Value cannot be zero");
+//!     let value: i32 = contents.trim().parse().context("Could not parse file")?;
+//!     println!("Value = {}", value);
 //!
-//!     Ok(value)
-//! }
-//!
-//! fn main() {
-//!     let file = "example.txt";
-//!
-//!     if let Err(e) = run(file) {
-//!         eprintln!("Error: {}", e);
-//!         e.iter_causes().for_each(|c| eprintln!("Caused by: {}", c));
-//!     }
+//!     Ok(())
 //! }
 //! ```
 
@@ -53,6 +49,7 @@
 use std::{error::Error as StdError, fmt, result::Result as StdResult};
 
 mod macros;
+pub mod termination;
 
 pub type Result<T> = StdResult<T, Error>;
 
@@ -138,4 +135,4 @@ pub fn err_msg<S: Into<String>>(ctx: S) -> Error { Error { ctx: ctx.into(), caus
 
 /// Returns an iterator over the causes of an error.
 #[inline]
-pub fn iter_causes<E: StdError>(e: &E) -> Causes { Causes { cause: e.source() } }
+pub fn iter_causes<E: StdError + ?Sized>(e: &E) -> Causes { Causes { cause: e.source() } }
