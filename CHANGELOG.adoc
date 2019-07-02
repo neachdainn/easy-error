@@ -8,8 +8,6 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog] an
 
 === Added ===
 
-* Added the `termination` module, which makes returning a `Result` from the `main` function more ergonomic.
-
 === Changed ===
 
 === Deprecated ===
@@ -23,6 +21,12 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog] an
 //------------------------------------------------------------------------------
 // Past Releases
 //------------------------------------------------------------------------------
+
+== [easy-error v0.1.0] - 2019-06-20 ==
+
+=== Added ===
+
+* Added the `termination` module, which makes returning a `Result` from the `main` function more ergonomic.
 
 == [easy-error v0.1.0] - 2019-06-20 ==
 

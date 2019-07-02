@@ -3,11 +3,11 @@
 macro_rules! bail
 {
 	($ctx:expr) => {
-		return Err($crate::err_msg($ctx));
+		return Err($crate::err_msg($ctx).into());
 	};
 
 	($fmt:expr, $($arg:tt)*) => {
-		return Err($crate::err_msg(format!($fmt, $($arg)*)));
+		return Err($crate::err_msg(format!($fmt, $($arg)*)).into());
 	};
 }
 
@@ -17,13 +17,13 @@ macro_rules! ensure
 {
 	($cond:expr, $ctx:expr) => {
 		if !($cond) {
-			return Err($crate::err_msg($ctx));
+			return Err($crate::err_msg($ctx).into());
 		}
 	};
 
 	($cond:expr, $fmt:expr, $($arg:tt)*) => {
 		if !($cond) {
-			return Err($crate::err_msg(format!($fmt, $($arg)*)));
+			return Err($crate::err_msg(format!($fmt, $($arg)*)).into());
 		}
 	};
 }
