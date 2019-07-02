@@ -1,13 +1,15 @@
 //! Types that are useful in combination with the `Termination` trait.
 //!
-//! Given the current implementation of the `Termination` trait, and the implementation for every
-//! type that implements `Debug`, having a `main` function that returns a `Result` requires either
-//! using a type that implements the `Debug` trait poorly or dealing with an output that isn't very
-//! user friendly.
+//! Given the current implementation of the `Termination` trait, and the
+//! implementation for every type that implements `Debug`, having a `main`
+//! function that returns a `Result` requires either using a type that
+//! implements the `Debug` trait poorly or dealing with an output that isn't
+//! very user friendly.
 //!
-//! The types here help alleviate those issues. To begin with, we have an `Error` type that simply
-//! wraps any possible error and implements `Debug` in such a way as to make the output look nice.
-//! Additionally, there is a `Result` specialization in order to make the `main` function a little
+//! The types here help alleviate those issues. To begin with, we have an
+//! `Error` type that simply wraps any possible error and implements `Debug` in
+//! such a way as to make the output look nice. Additionally, there is a
+//! `Result` specialization in order to make the `main` function a little
 //! cleaner.
 use std::{error::Error as StdError, fmt};
 
@@ -34,8 +36,5 @@ impl fmt::Debug for Error
 
 impl<E: StdError + 'static> From<E> for Error
 {
-	fn from(err: E) -> Error
-	{
-		Error { inner: Box::new(err) }
-	}
+	fn from(err: E) -> Error { Error { inner: Box::new(err) } }
 }

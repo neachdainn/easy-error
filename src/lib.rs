@@ -1,15 +1,16 @@
 //! # Easy-error
 //!
-//! This crate is a lightweight error handling library meant to play well with the standard `Error`
-//! trait. It is designed for quick prototyping or for Command-line applications where any error
-//! will simply bubble up to the user. There are four major components of this crate:
+//! This crate is a lightweight error handling library meant to play well with
+//! the standard `Error` trait. It is designed for quick prototyping or for
+//! Command-line applications where any error will simply bubble up to the user.
+//! There are four major components of this crate:
 //!
-//! 1. A basic, string-based error type that is meant for either quick prototyping or human-facing
-//!    errors.
+//! 1. A basic, string-based error type that is meant for either quick
+//!    prototyping or human-facing errors.
 //! 2. A nice way to iterate over the causes of an error.
 //! 3. Some macros that make returning errors slightly more ergonomic.
-//! 4. A "termination" type that produces nicely formatted error messages when returned from the
-//!    `main` function.
+//! 4. A "termination" type that produces nicely formatted error messages when
+//!    returned from the `main` function.
 //!
 //! ## Rust Version Requirements
 //!
@@ -21,7 +22,7 @@
 //!
 //! ## Example
 //!
-//! ```rust
+//! ```no_run
 //! use std::{fs::File, io::Read};
 //! use easy_error::{ResultExt, termination};
 //!
@@ -32,7 +33,7 @@
 //!     let mut contents = String::new();
 //!     file.read_to_string(&mut contents).context("Unable to read file")?;
 //!
-//!     let value = contents.trim().parse().context("Could not parse file")?;
+//!     let value: i32 = contents.trim().parse().context("Could not parse file")?;
 //!     println!("Value = {}", value);
 //!
 //!     Ok(())

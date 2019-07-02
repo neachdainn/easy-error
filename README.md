@@ -34,7 +34,7 @@ fn main() -> termination::Result {
     let mut contents = String::new();
     file.read_to_string(&mut contents).context("Unable to read file")?;
 
-    let value = contents.trim().parse().context("Could not parse file")?;
+    let value: i32 = contents.trim().parse().context("Could not parse file")?;
     println!("Value = {}", value);
 
     Ok(())
