@@ -76,7 +76,7 @@ pub struct Error
 	pub ctx: String,
 
 	/// The optional cause of the error.
-	pub cause: Option<Box<dyn StdError + 'static>>,
+	pub cause: Option<Box<dyn StdError + Send + 'static>>,
 }
 
 impl Error
@@ -85,16 +85,16 @@ impl Error
 	pub fn new<S, E>(ctx: S, cause: E) -> Error
 	where
 		S: Into<String>,
-		E: StdError + 'static,
+		E: StdError + Send + 'static,
 	{
 		let ctx = ctx.into();
-		let cause: Option<Box<dyn StdError + 'static>> = Some(Box::new(cause));
+		let cause: Option<Box<dyn StdError + Send + 'static>> = Some(Box::new(cause));
 
 		Error { ctx, cause }
 	}
 
 	/// Iterates over the causes of the error.
-	pub fn iter_causes(&self) -> Causes { Causes { cause: self.cause.as_ref().map(Box::as_ref) } }
+	pub fn iter_causes(&self) -> Causes { iter_causes(self) }
 }
 
 impl fmt::Display for Error
@@ -106,7 +106,7 @@ impl StdError for Error
 {
 	fn description(&self) -> &str { &self.ctx }
 
-	fn source(&self) -> Option<&(dyn StdError + 'static)> { self.cause.as_ref().map(Box::as_ref) }
+	fn source(&self) -> Option<&(dyn StdError + 'static)> { self.cause.as_ref().map(|c| &**c as _) }
 }
 
 /// An iterator over the causes of an error.
@@ -136,7 +136,9 @@ pub trait ResultExt<T>
 	fn context<S: Into<String>>(self, ctx: S) -> Result<T>;
 }
 
-impl<T, E: StdError + 'static> ResultExt<T> for StdResult<T, E>
+impl<T, E> ResultExt<T> for StdResult<T, E>
+where
+	E: StdError + Send + 'static
 {
 	fn context<S: Into<String>>(self, ctx: S) -> Result<T>
 	{
