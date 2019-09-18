@@ -138,7 +138,7 @@ pub trait ResultExt<T>
 
 impl<T, E> ResultExt<T> for StdResult<T, E>
 where
-	E: StdError + Send + 'static
+	E: StdError + Send + 'static,
 {
 	fn context<S: Into<String>>(self, ctx: S) -> Result<T>
 	{
