@@ -25,9 +25,9 @@ Any change that requires a new Rustc version will be considered a breaking chang
 
 ```rust
 use std::{fs::File, io::Read};
-use easy_error::{bail, ensure, Result, ResultExt, termination};
+use easy_error::{bail, ensure, Error, ResultExt, Terminator};
 
-fn from_file() -> Result<i32> {
+fn from_file() -> Result<i32, Error> {
     let file_name = "example.txt";
     let mut file = File::open(file_name).context("Could not open file")?;
 
@@ -37,7 +37,7 @@ fn from_file() -> Result<i32> {
     contents.trim().parse().context("Could not parse file")
 }
 
-fn validate(value: i32) -> Result<()> {
+fn validate(value: i32) -> Result<(), Error> {
     ensure!(value > 0, "Value must be greater than zero (found {})", value);
 
     if value % 2 == 1 {
@@ -47,7 +47,7 @@ fn validate(value: i32) -> Result<()> {
     Ok(())
 }
 
-fn main() -> termination::Result {
+fn main() -> Result<(), Terminator> {
     let value = from_file().context("Unable to get value from file")?;
     validate(value).context("Value is not acceptable")?;
 
