@@ -64,7 +64,8 @@
 use std::{error::Error as StdError, fmt, result::Result as StdResult};
 
 mod macros;
-pub mod termination;
+mod terminator;
+pub use terminator::Terminator;
 
 pub type Result<T> = StdResult<T, Error>;
 

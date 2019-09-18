@@ -11,6 +11,7 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog] an
 === Changed ===
 
 * All error types converted to an `easy_error::Error` now need to implement `Send`. (#2)
+* The `termination` module is no longer public and the `termination::Error` type is now just `Terminator`.
 
 === Deprecated ===
 
