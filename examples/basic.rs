@@ -1,4 +1,4 @@
-use easy_error::{ensure, Terminator, ResultExt};
+use easy_error::{ensure, ResultExt, Terminator};
 use std::{fs::File, io::Read};
 
 fn main() -> Result<(), Terminator> {
