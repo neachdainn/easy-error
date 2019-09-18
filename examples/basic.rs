@@ -1,7 +1,7 @@
-use easy_error::{ensure, termination, ResultExt};
+use easy_error::{ensure, ResultExt, Terminator};
 use std::{fs::File, io::Read};
 
-fn main() -> termination::Result {
+fn main() -> Result<(), Terminator> {
     let file = std::env::args().nth(1).unwrap_or("example.txt".to_string());
     let mut file = File::open(file).context("Could not open file")?;
 
