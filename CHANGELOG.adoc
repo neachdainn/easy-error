@@ -10,9 +10,6 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog] an
 
 === Changed ===
 
-* All error types converted to an `easy_error::Error` now need to implement `Send`. (#2)
-* The `termination` module is no longer public and the `termination::Error` type is now just `Terminator`.
-
 === Deprecated ===
 
 === Removed ===
@@ -25,7 +22,14 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog] an
 // Past Releases
 //------------------------------------------------------------------------------
 
-== [easy-error v0.1.0] - 2019-06-20 ==
+== [easy-error v0.2.0] - 2019-09-18 ==
+
+=== Changed ===
+
+* All error types converted to an `easy_error::Error` now need to implement `Send`. (#2)
+* The `termination` module is no longer public and the `termination::Error` type is now just `Terminator`.
+
+== [easy-error v0.1.1] - 2019-06-20 ==
 
 === Added ===
 
