@@ -133,11 +133,14 @@ impl<'a> Iterator for Causes<'a>
 	}
 }
 
-/// Extention methods to the `Result` type.
+/// Extension methods to the `Result` type.
 pub trait ResultExt<T>
 {
 	/// Adds some context to the error.
 	fn context<S: ToString>(self, ctx: S) -> Result<T>;
+
+	/// Adds context to the error, evaluating the context function only if there is an `Err`.
+	fn with_context<S: ToString, F: FnOnce() -> S>(self, ctx_fn: F) -> Result<T>;
 }
 
 impl<T, E> ResultExt<T> for std::result::Result<T, E>
@@ -147,6 +150,11 @@ where
 	fn context<S: ToString>(self, ctx: S) -> Result<T>
 	{
 		self.map_err(|e| Error { ctx: ctx.to_string(), cause: Some(Box::new(e)) })
+	}
+
+	fn with_context<S: ToString, F: FnOnce() -> S>(self, ctx_fn: F) -> Result<T>
+	{
+		self.map_err(|e| Error { ctx: ctx_fn().to_string(), cause: Some(Box::new(e)) })
 	}
 }
 
