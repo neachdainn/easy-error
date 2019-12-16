@@ -61,7 +61,7 @@
 #![warn(clippy::pedantic)]
 #![allow(clippy::use_self)]
 
-use std::{error::Error as StdError, fmt, result::Result as StdResult};
+use std::{borrow::Cow, error::Error as StdError, fmt, result::Result as StdResult};
 
 mod macros;
 pub mod termination;
@@ -73,7 +73,7 @@ pub type Result<T> = StdResult<T, Error>;
 pub struct Error
 {
 	/// The human-targetting error string.
-	pub ctx: String,
+	pub ctx: Cow<'static, str>,
 
 	/// The optional cause of the error.
 	pub cause: Option<Box<dyn StdError + 'static>>,
@@ -84,7 +84,7 @@ impl Error
 	/// Create a new error with the given cause.
 	pub fn new<S, E>(ctx: S, cause: E) -> Error
 	where
-		S: Into<String>,
+		S: Into<Cow<'static, str>>,
 		E: StdError + 'static,
 	{
 		let ctx = ctx.into();
@@ -133,12 +133,12 @@ impl<'a> Iterator for Causes<'a>
 pub trait ResultExt<T>
 {
 	/// Adds some context to the error.
-	fn context<S: Into<String>>(self, ctx: S) -> Result<T>;
+	fn context<S: Into<Cow<'static, str>>>(self, ctx: S) -> Result<T>;
 }
 
 impl<T, E: StdError + 'static> ResultExt<T> for StdResult<T, E>
 {
-	fn context<S: Into<String>>(self, ctx: S) -> Result<T>
+	fn context<S: Into<Cow<'static, str>>>(self, ctx: S) -> Result<T>
 	{
 		self.map_err(|e| Error { ctx: ctx.into(), cause: Some(Box::new(e)) })
 	}
@@ -146,7 +146,7 @@ impl<T, E: StdError + 'static> ResultExt<T> for StdResult<T, E>
 
 /// Creates an error message from the provided string.
 #[inline]
-pub fn err_msg<S: Into<String>>(ctx: S) -> Error { Error { ctx: ctx.into(), cause: None } }
+pub fn err_msg<S: Into<Cow<'static, str>>>(ctx: S) -> Error { Error { ctx: ctx.into(), cause: None } }
 
 /// Returns an iterator over the causes of an error.
 #[inline]
