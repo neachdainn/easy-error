@@ -100,9 +100,6 @@ impl Error
 
 		Error { ctx, cause }
 	}
-
-	/// Iterates over the causes of the error.
-	pub fn iter_causes(&self) -> Causes { iter_causes(self) }
 }
 
 impl Display for Error
@@ -117,29 +114,6 @@ impl error::Error for Error
 	fn source(&self) -> Option<&(dyn error::Error + 'static)>
 	{
 		self.cause.as_ref().map(|c| &**c as _)
-	}
-}
-
-/// An iterator over the causes of an error.
-// Add the `must_use` tag to please Clippy. I really doubt there will ever be a situation where
-// someone creates a `Causes` iterator and doesn't consume it but we might as well warn them.
-#[must_use = "iterators are lazy and do nothing unless consumed"]
-pub struct Causes<'a>
-{
-	/// The next cause to display.
-	cause: Option<&'a (dyn error::Error + 'static)>,
-}
-
-impl<'a> Iterator for Causes<'a>
-{
-	type Item = &'a (dyn error::Error + 'static);
-
-	fn next(&mut self) -> Option<Self::Item>
-	{
-		let cause = self.cause.take();
-		self.cause = cause.and_then(error::Error::source);
-
-		cause
 	}
 }
 
@@ -169,11 +143,62 @@ where
 	}
 }
 
+/// Extension methods to `Error` types.
+pub trait ErrorExt: error::Error
+{
+	fn iter_chain(&self) -> Causes;
+
+	fn iter_causes(&self) -> Causes
+	{
+		Causes { cause: self.iter_chain().nth(1) }
+	}
+
+	fn find_root_cause(&self) -> &(dyn error::Error + 'static)
+	{
+		self.iter_chain().last().expect("source chain should at least contain original error")
+	}
+}
+
+impl<E: error::Error + 'static> ErrorExt for E
+{
+	fn iter_chain(&self) -> Causes
+	{
+		Causes { cause: Some(self) }
+	}
+}
+
+impl ErrorExt for dyn error::Error
+{
+	fn iter_chain(&self) -> Causes
+	{
+		Causes { cause: Some(self) }
+	}
+}
+
+/// An iterator over the causes of an error.
+// Add the `must_use` tag to please Clippy. I really doubt there will ever be a situation where
+// someone creates a `Causes` iterator and doesn't consume it but we might as well warn them.
+#[must_use = "iterators are lazy and do nothing unless consumed"]
+pub struct Causes<'a>
+{
+	/// The next cause to display.
+	cause: Option<&'a (dyn error::Error + 'static)>,
+}
+
+impl<'a> Iterator for Causes<'a>
+{
+	type Item = &'a (dyn error::Error + 'static);
+
+	fn next(&mut self) -> Option<Self::Item>
+	{
+		let cause = self.cause.take();
+		self.cause = cause.and_then(error::Error::source);
+
+		cause
+	}
+}
+
 /// Creates an error message from the provided string.
 #[inline]
 #[allow(clippy::needless_pass_by_value)] // `T: ToString` implies `&T: ToString`
 pub fn err_msg<S: ToString>(ctx: S) -> Error { Error { ctx: ctx.to_string(), cause: None } }
-
-/// Returns an iterator over the causes of an error.
-#[inline]
-pub fn iter_causes<E: error::Error + ?Sized>(e: &E) -> Causes { Causes { cause: e.source() } }

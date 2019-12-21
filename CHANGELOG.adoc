@@ -9,6 +9,7 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog] an
 === Added ===
 
 * The `ResultExt::with_context` function. (#3)
+* The `ErrorExt` trait with methods for iterating over the causes of an error. (#1)
 
 === Changed ===
 
@@ -17,6 +18,8 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog] an
 === Deprecated ===
 
 === Removed ===
+
+* The `Error::iter_causes` and `crate::iter_causes` functions as they have been replaced by `ErrorExt::iter_causes`. (#1)
 
 === Fixed ===
 
