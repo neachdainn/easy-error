@@ -2,12 +2,8 @@
 #[macro_export]
 macro_rules! bail
 {
-	($ctx:expr) => {
-		return Err($crate::err_msg($ctx).into());
-	};
-
-	($fmt:expr, $($arg:tt)*) => {
-		return Err($crate::err_msg(format!($fmt, $($arg)*)).into());
+	($($arg:tt)*) => {
+		return Err($crate::format_err!($($arg)*)).into();
 	};
 }
 
@@ -15,15 +11,9 @@ macro_rules! bail
 #[macro_export]
 macro_rules! ensure
 {
-	($cond:expr, $ctx:expr) => {
+	($cond:expr, $($arg:tt)*) => {
 		if !($cond) {
-			return Err($crate::err_msg($ctx).into());
-		}
-	};
-
-	($cond:expr, $fmt:expr, $($arg:tt)*) => {
-		if !($cond) {
-			return Err($crate::err_msg(format!($fmt, $($arg)*)).into());
+			return Err($crate::format_err!($($arg)*).into());
 		}
 	};
 }
@@ -32,5 +22,5 @@ macro_rules! ensure
 #[macro_export]
 macro_rules! format_err
 {
-	($($arg:tt)*) => { $crate::err_msg(format!($($arg)*)) };
+	($($arg:tt)*) => { $crate::err_msg(format_args!($($arg)*)) };
 }

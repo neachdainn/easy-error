@@ -59,15 +59,21 @@
 #![deny(clippy::all)]
 #![warn(clippy::nursery)]
 #![warn(clippy::pedantic)]
-#![allow(clippy::use_self)]
+#![warn(clippy::unknown_clippy_lints)] // Enable checking against nightly Clippy
+#![allow(clippy::use_self)] // I rather like the name repetition
+#![allow(clippy::missing_errors_doc)] // This is an error handling library, errors are implied.
 
-use std::{error::Error as StdError, fmt, result::Result as StdResult};
+use std::{
+	error,
+	fmt::{self, Display, Formatter},
+	string::ToString,
+};
 
 mod macros;
 mod terminator;
 pub use terminator::Terminator;
 
-pub type Result<T> = StdResult<T, Error>;
+pub type Result<T> = std::result::Result<T, Error>;
 
 /// An error that is a human-targetted string plus an optional cause.
 #[derive(Debug)]
@@ -77,19 +83,20 @@ pub struct Error
 	pub ctx: String,
 
 	/// The optional cause of the error.
-	pub cause: Option<Box<dyn StdError + Send + 'static>>,
+	pub cause: Option<Box<dyn error::Error + Send + 'static>>,
 }
 
 impl Error
 {
 	/// Create a new error with the given cause.
+	#[allow(clippy::needless_pass_by_value)] // `T: ToString` implies `&T: ToString`
 	pub fn new<S, E>(ctx: S, cause: E) -> Error
 	where
-		S: Into<String>,
-		E: StdError + Send + 'static,
+		S: ToString,
+		E: error::Error + Send + 'static,
 	{
-		let ctx = ctx.into();
-		let cause: Option<Box<dyn StdError + Send + 'static>> = Some(Box::new(cause));
+		let ctx = ctx.to_string();
+		let cause: Option<Box<dyn error::Error + Send + 'static>> = Some(Box::new(cause));
 
 		Error { ctx, cause }
 	}
@@ -98,59 +105,75 @@ impl Error
 	pub fn iter_causes(&self) -> Causes { iter_causes(self) }
 }
 
-impl fmt::Display for Error
+impl Display for Error
 {
-	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.ctx) }
+	fn fmt(&self, f: &mut Formatter) -> fmt::Result { write!(f, "{}", self.ctx) }
 }
 
-impl StdError for Error
+impl error::Error for Error
 {
 	fn description(&self) -> &str { &self.ctx }
 
-	fn source(&self) -> Option<&(dyn StdError + 'static)> { self.cause.as_ref().map(|c| &**c as _) }
+	fn source(&self) -> Option<&(dyn error::Error + 'static)>
+	{
+		self.cause.as_ref().map(|c| &**c as _)
+	}
 }
 
 /// An iterator over the causes of an error.
+// Add the `must_use` tag to please Clippy. I really doubt there will ever be a situation where
+// someone creates a `Causes` iterator and doesn't consume it but we might as well warn them.
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct Causes<'a>
 {
 	/// The next cause to display.
-	cause: Option<&'a (dyn StdError + 'static)>,
+	cause: Option<&'a (dyn error::Error + 'static)>,
 }
 
 impl<'a> Iterator for Causes<'a>
 {
-	type Item = &'a (dyn StdError + 'static);
+	type Item = &'a (dyn error::Error + 'static);
 
 	fn next(&mut self) -> Option<Self::Item>
 	{
 		let cause = self.cause.take();
-		self.cause = cause.and_then(StdError::source);
+		self.cause = cause.and_then(error::Error::source);
 
 		cause
 	}
 }
 
-/// Extention methods to the `Result` type.
+/// Extension methods to the `Result` type.
 pub trait ResultExt<T>
 {
 	/// Adds some context to the error.
-	fn context<S: Into<String>>(self, ctx: S) -> Result<T>;
+	fn context<S: ToString>(self, ctx: S) -> Result<T>;
+
+	/// Adds context to the error, evaluating the context function only if there
+	/// is an `Err`.
+	fn with_context<S: ToString, F: FnOnce() -> S>(self, ctx_fn: F) -> Result<T>;
 }
 
-impl<T, E> ResultExt<T> for StdResult<T, E>
+impl<T, E> ResultExt<T> for std::result::Result<T, E>
 where
-	E: StdError + Send + 'static,
+	E: error::Error + Send + 'static,
 {
-	fn context<S: Into<String>>(self, ctx: S) -> Result<T>
+	fn context<S: ToString>(self, ctx: S) -> Result<T>
 	{
-		self.map_err(|e| Error { ctx: ctx.into(), cause: Some(Box::new(e)) })
+		self.map_err(|e| Error { ctx: ctx.to_string(), cause: Some(Box::new(e)) })
+	}
+
+	fn with_context<S: ToString, F: FnOnce() -> S>(self, ctx_fn: F) -> Result<T>
+	{
+		self.map_err(|e| Error { ctx: ctx_fn().to_string(), cause: Some(Box::new(e)) })
 	}
 }
 
 /// Creates an error message from the provided string.
 #[inline]
-pub fn err_msg<S: Into<String>>(ctx: S) -> Error { Error { ctx: ctx.into(), cause: None } }
+#[allow(clippy::needless_pass_by_value)] // `T: ToString` implies `&T: ToString`
+pub fn err_msg<S: ToString>(ctx: S) -> Error { Error { ctx: ctx.to_string(), cause: None } }
 
 /// Returns an iterator over the causes of an error.
 #[inline]
-pub fn iter_causes<E: StdError + ?Sized>(e: &E) -> Causes { Causes { cause: e.source() } }
+pub fn iter_causes<E: error::Error + ?Sized>(e: &E) -> Causes { Causes { cause: e.source() } }
