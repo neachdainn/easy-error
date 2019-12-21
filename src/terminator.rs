@@ -1,5 +1,8 @@
 //! Types that are useful in combination with the `Termination` trait.
-use std::{error, fmt::{self, Debug, Formatter}};
+use std::{
+	error,
+	fmt::{self, Debug, Formatter},
+};
 
 /// An error that wraps all other error types for a nicer debug output.
 ///

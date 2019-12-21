@@ -62,7 +62,11 @@
 #![allow(clippy::use_self)] // I rather like the name repetition
 #![allow(clippy::missing_errors_doc)] // This is an error handling library, errors are implied.
 
-use std::{error, fmt::{self, Display, Formatter}, string::ToString};
+use std::{
+	error,
+	fmt::{self, Display, Formatter},
+	string::ToString,
+};
 
 mod macros;
 mod terminator;
@@ -144,7 +148,8 @@ pub trait ResultExt<T>
 	/// Adds some context to the error.
 	fn context<S: ToString>(self, ctx: S) -> Result<T>;
 
-	/// Adds context to the error, evaluating the context function only if there is an `Err`.
+	/// Adds context to the error, evaluating the context function only if there
+	/// is an `Err`.
 	fn with_context<S: ToString, F: FnOnce() -> S>(self, ctx_fn: F) -> Result<T>;
 }
 
