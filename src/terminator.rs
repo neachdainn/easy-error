@@ -1,5 +1,5 @@
 //! Types that are useful in combination with the `Termination` trait.
-use std::{error::Error as StdError, fmt};
+use std::{error, fmt::{self, Debug, Formatter}};
 
 /// An error that wraps all other error types for a nicer debug output.
 ///
@@ -16,12 +16,12 @@ use std::{error::Error as StdError, fmt};
 /// cleaner.
 pub struct Terminator
 {
-	inner: Box<dyn StdError + 'static>,
+	inner: Box<dyn error::Error + 'static>,
 }
 
-impl fmt::Debug for Terminator
+impl Debug for Terminator
 {
-	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
+	fn fmt(&self, f: &mut Formatter) -> fmt::Result
 	{
 		writeln!(f, "{}", self.inner)?;
 		for cause in super::iter_causes(self.inner.as_ref()) {
@@ -32,7 +32,7 @@ impl fmt::Debug for Terminator
 	}
 }
 
-impl<E: StdError + 'static> From<E> for Terminator
+impl<E: error::Error + 'static> From<E> for Terminator
 {
 	fn from(err: E) -> Terminator { Terminator { inner: Box::new(err) } }
 }

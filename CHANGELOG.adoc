@@ -10,6 +10,8 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog] an
 
 === Changed ===
 
+* The context functions and `Error` type are now generic over `ToString` instead of `IntoString`.
+
 === Deprecated ===
 
 === Removed ===
