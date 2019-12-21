@@ -4,6 +4,8 @@ use std::{
 	fmt::{self, Debug, Formatter},
 };
 
+use crate::ErrorExt;
+
 /// An error that wraps all other error types for a nicer debug output.
 ///
 /// Given the current implementation of the `Termination` trait, and the
@@ -27,7 +29,7 @@ impl Debug for Terminator
 	fn fmt(&self, f: &mut Formatter) -> fmt::Result
 	{
 		writeln!(f, "{}", self.inner)?;
-		for cause in super::iter_causes(self.inner.as_ref()) {
+		for cause in self.inner.iter_causes() {
 			writeln!(f, "Caused by: {}", cause)?;
 		}
 
