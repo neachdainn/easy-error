@@ -148,10 +148,7 @@ pub trait ErrorExt: error::Error
 {
 	fn iter_chain(&self) -> Causes;
 
-	fn iter_causes(&self) -> Causes
-	{
-		Causes { cause: self.iter_chain().nth(1) }
-	}
+	fn iter_causes(&self) -> Causes { Causes { cause: self.iter_chain().nth(1) } }
 
 	fn find_root_cause(&self) -> &(dyn error::Error + 'static)
 	{
@@ -161,18 +158,12 @@ pub trait ErrorExt: error::Error
 
 impl<E: error::Error + 'static> ErrorExt for E
 {
-	fn iter_chain(&self) -> Causes
-	{
-		Causes { cause: Some(self) }
-	}
+	fn iter_chain(&self) -> Causes { Causes { cause: Some(self) } }
 }
 
 impl ErrorExt for dyn error::Error
 {
-	fn iter_chain(&self) -> Causes
-	{
-		Causes { cause: Some(self) }
-	}
+	fn iter_chain(&self) -> Causes { Causes { cause: Some(self) } }
 }
 
 /// An iterator over the causes of an error.
