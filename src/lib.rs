@@ -59,7 +59,8 @@
 #![deny(clippy::all)]
 #![warn(clippy::nursery)]
 #![warn(clippy::pedantic)]
-#![allow(clippy::use_self)]
+#![allow(clippy::use_self)] // I rather like the name repetition
+#![allow(clippy::missing_errors_doc)] // This is an error handling library, errors are implied.
 
 use std::{error, fmt::{self, Display, Formatter}, string::ToString};
 
@@ -83,6 +84,7 @@ pub struct Error
 impl Error
 {
 	/// Create a new error with the given cause.
+	#[allow(clippy::needless_pass_by_value)] // `T: ToString` implies `&T: ToString`
 	pub fn new<S, E>(ctx: S, cause: E) -> Error
 	where
 		S: ToString,
@@ -114,6 +116,9 @@ impl error::Error for Error
 }
 
 /// An iterator over the causes of an error.
+// Add the `must_use` tag to please Clippy. I really doubt there will ever be a situation where
+// someone creates a `Causes` iterator and doesn't consume it but we might as well warn them.
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct Causes<'a>
 {
 	/// The next cause to display.
@@ -160,6 +165,7 @@ where
 
 /// Creates an error message from the provided string.
 #[inline]
+#[allow(clippy::needless_pass_by_value)] // `T: ToString` implies `&T: ToString`
 pub fn err_msg<S: ToString>(ctx: S) -> Error { Error { ctx: ctx.to_string(), cause: None } }
 
 /// Returns an iterator over the causes of an error.
