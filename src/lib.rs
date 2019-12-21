@@ -59,6 +59,7 @@
 #![deny(clippy::all)]
 #![warn(clippy::nursery)]
 #![warn(clippy::pedantic)]
+#![warn(clippy::unknown_clippy_lints)] // Enable checking against nightly Clippy
 #![allow(clippy::use_self)] // I rather like the name repetition
 #![allow(clippy::missing_errors_doc)] // This is an error handling library, errors are implied.
 
