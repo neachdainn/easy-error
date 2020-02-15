@@ -3,7 +3,7 @@
 macro_rules! bail
 {
 	($($arg:tt)*) => {
-		return Err($crate::format_err!($($arg)*)).into();
+		return Err($crate::format_err!($($arg)*).into());
 	};
 }
 
