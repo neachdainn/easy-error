@@ -66,6 +66,7 @@
 use std::{
 	error,
 	fmt::{self, Display, Formatter},
+	panic::Location,
 	string::ToString,
 };
 
@@ -82,6 +83,9 @@ pub struct Error
 	/// The human-targetting error string.
 	pub ctx: String,
 
+	/// The location of the error.
+	pub location: &'static Location<'static>,
+
 	/// The optional cause of the error.
 	pub cause: Option<Box<dyn error::Error + Send + 'static>>,
 }
@@ -90,21 +94,26 @@ impl Error
 {
 	/// Create a new error with the given cause.
 	#[allow(clippy::needless_pass_by_value)] // `T: ToString` implies `&T: ToString`
+	#[track_caller]
 	pub fn new<S, E>(ctx: S, cause: E) -> Error
 	where
 		S: ToString,
 		E: error::Error + Send + 'static,
 	{
 		let ctx = ctx.to_string();
+		let location = Location::caller();
 		let cause: Option<Box<dyn error::Error + Send + 'static>> = Some(Box::new(cause));
 
-		Error { ctx, cause }
+		Error { ctx, location, cause }
 	}
 }
 
 impl Display for Error
 {
-	fn fmt(&self, f: &mut Formatter) -> fmt::Result { write!(f, "{}", self.ctx) }
+	fn fmt(&self, f: &mut Formatter) -> fmt::Result
+	{
+		write!(f, "{} ({})", self.ctx, self.location)
+	}
 }
 
 impl error::Error for Error
@@ -121,10 +130,12 @@ impl error::Error for Error
 pub trait ResultExt<T>
 {
 	/// Adds some context to the error.
+	#[track_caller]
 	fn context<S: ToString>(self, ctx: S) -> Result<T>;
 
 	/// Adds context to the error, evaluating the context function only if there
 	/// is an `Err`.
+	#[track_caller]
 	fn with_context<S: ToString, F: FnOnce() -> S>(self, ctx_fn: F) -> Result<T>;
 }
 
@@ -134,12 +145,14 @@ where
 {
 	fn context<S: ToString>(self, ctx: S) -> Result<T>
 	{
-		self.map_err(|e| Error { ctx: ctx.to_string(), cause: Some(Box::new(e)) })
+		let location = Location::caller();
+		self.map_err(|e| Error { ctx: ctx.to_string(), location, cause: Some(Box::new(e)) })
 	}
 
 	fn with_context<S: ToString, F: FnOnce() -> S>(self, ctx_fn: F) -> Result<T>
 	{
-		self.map_err(|e| Error { ctx: ctx_fn().to_string(), cause: Some(Box::new(e)) })
+		let location = Location::caller();
+		self.map_err(|e| Error { ctx: ctx_fn().to_string(), location, cause: Some(Box::new(e)) })
 	}
 }
 
@@ -192,4 +205,8 @@ impl<'a> Iterator for Causes<'a>
 /// Creates an error message from the provided string.
 #[inline]
 #[allow(clippy::needless_pass_by_value)] // `T: ToString` implies `&T: ToString`
-pub fn err_msg<S: ToString>(ctx: S) -> Error { Error { ctx: ctx.to_string(), cause: None } }
+#[track_caller]
+pub fn err_msg<S: ToString>(ctx: S) -> Error
+{
+	Error { ctx: ctx.to_string(), location: Location::caller(), cause: None }
+}

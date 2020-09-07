@@ -3,7 +3,7 @@
 [![docs.rs](https://docs.rs/easy-error/badge.svg)](https://docs.rs/easy-error)
 [![crates.io](http://img.shields.io/crates/v/easy-error.svg)](http://crates.io/crates/easy-error)
 ![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Rustc 1.32+](https://img.shields.io/badge/rustc-1.32+-lightgray.svg)
+![Rustc 1.46+](https://img.shields.io/badge/rustc-1.46+-lightgray.svg)
 ![Pipeline](https://gitlab.com/neachdainn/easy-error/badges/master/pipeline.svg)
 
 This crate is a lightweight error handling library meant to play well with the standard `Error` trait.
@@ -17,7 +17,7 @@ There are four major components of this crate:
 
 ## Rust Version Requirements
 
-The current version requires **Rustc 1.32 or newer**.
+The current version requires **Rustc 1.46 or newer**.
 In general, this crate will be compilable with the Rustc version available on the oldest Ubuntu LTS release.
 Any change that requires a new Rustc version will be considered a breaking change and will be handled accordingly.
 
