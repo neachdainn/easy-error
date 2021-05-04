@@ -13,9 +13,11 @@ format:
   image: "rustlang/rust:nightly-slim"
   stage: analysis
   script:
+    - rustup --version
     - rustup component add rustfmt
     - cargo fmt --version
     - cargo fmt -- --check
+  allow_failure: true
   only:
     - tags
     - master
@@ -25,6 +27,7 @@ format:
 clippy:
   stage: analysis
   script:
+    - rustup --version
     - rustup component add clippy
     - cargo clippy --version
     - cargo clippy --all-targets --all-features
