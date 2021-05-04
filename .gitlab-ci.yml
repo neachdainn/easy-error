@@ -35,7 +35,7 @@ clippy:
 
 # Test the project against the minimum Rust version to make sure we don't raise it
 minimum-rust-version:
-  image: "rust:1.32-slim"
+  image: "rust:1.46-slim"
   stage: test
   script:
     - rustc --version
