@@ -18,8 +18,8 @@ There are four major components of this crate:
 ## Rust Version Requirements
 
 The current version requires **Rustc 1.46 or newer**.
-In general, this crate will be compilable with the Rustc version available on the oldest Ubuntu LTS release.
-Any change that requires a new Rustc version will be considered a breaking change and will be handled accordingly.
+In general, this crate will be compilable with the Rustc version available on the oldest supported Ubuntu LTS release.
+Any change that requires a newer version of Rustc than what is available on the oldest supported Ubuntu LTS will be considered a breaking change.
 
 ## Example
 

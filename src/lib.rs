@@ -14,11 +14,11 @@
 //!
 //! ## Rust Version Requirements
 //!
-//! The current version requires **Rustc 1.32 or newer**.
-//! In general, this crate will be compilable with the Rustc version available
-//! on the oldest Ubuntu LTS release. Any change that requires a new Rustc
-//! version will be considered a breaking change and will be handled
-//! accordingly.
+//! The current version requires **Rustc 1.46 or newer**.  In general, this
+//! crate will be compilable with the Rustc version available on the oldest
+//! supported Ubuntu LTS release.  Any change that requires a newer version of
+//! Rustc than what is available on the oldest supported Ubuntu LTS will
+//! be considered a breaking change.
 //!
 //! ## Example
 //!
@@ -59,9 +59,9 @@
 #![deny(clippy::all)]
 #![warn(clippy::nursery)]
 #![warn(clippy::pedantic)]
-#![warn(clippy::unknown_clippy_lints)] // Enable checking against nightly Clippy
 #![allow(clippy::use_self)] // I rather like the name repetition
 #![allow(clippy::missing_errors_doc)] // This is an error handling library, errors are implied.
+#![warn(unknown_lints)]
 
 use std::{
 	error,

@@ -22,6 +22,12 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog] an
 // Past Releases
 //------------------------------------------------------------------------------
 
+== [easy-error v1.0.0] - 2021-05-04 ==
+
+=== Added ===
+
+* All functions which create a new `Error` have `#[track_caller]` applied and the display of the error prints this information.
+
 == [easy-error v0.3.1] - 2020-02-15 ==
 
 === Fixed ===

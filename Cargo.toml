@@ -1,6 +1,6 @@
 [package]
 name = "easy-error"
-version = "0.4.0"
+version = "1.0.0"
 authors = ["Nathan Kent <nate@nkent.net>"]
 edition = "2018"
 
@@ -11,8 +11,6 @@ license = "MIT"
 
 keywords = ["error", "simple", "chain"]
 categories = ["rust-patterns"]
-
-publish = false # Waiting on Ubuntu LTS to hit 1.46
 
 [badges]
 gitlab = { repository = "neachdainn/easy-error", branch = "master" }
